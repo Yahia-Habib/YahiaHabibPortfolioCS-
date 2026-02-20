@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon - Yahia Habib Website</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background: #000000;
+            color: #00ff00;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Matrix falling numbers canvas */
+        #matrixCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.8;
+        }
+
+        /* Matrix-style background effect */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(0deg, transparent 24%, rgba(0, 255, 0, 0.05) 25%, rgba(0, 255, 0, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, 0.05) 75%, rgba(0, 255, 0, 0.05) 76%, transparent 77%, transparent),
+                linear-gradient(90deg, transparent 24%, rgba(0, 255, 0, 0.05) 25%, rgba(0, 255, 0, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, 0.05) 75%, rgba(0, 255, 0, 0.05) 76%, transparent 77%, transparent);
+            background-size: 50px 50px;
+            opacity: 0.2;
+            z-index: 0;
+        }
+
+        /* Animated grid lines */
+        .grid-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 0, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 0, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(40px);
+            }
+        }
+
+        /* Glitch effect particles */
+        .glitch-particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .glitch-particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+            animation: glitchFloat 3s infinite;
+        }
+
+        @keyframes glitchFloat {
+            0%, 100% {
+                opacity: 0;
+                transform: translateY(0);
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh);
+            }
+        }
+
+        /* Main container */
+        .container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Terminal-style border */
+        .terminal-window {
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 0, 0.3),
+                inset 0 0 20px rgba(0, 255, 0, 0.1);
+            max-width: 900px;
+            width: 100%;
+            overflow: hidden;
+            animation: terminalGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes terminalGlow {
+            from {
+                box-shadow: 
+                    0 0 20px rgba(0, 255, 0, 0.3),
+                    inset 0 0 20px rgba(0, 255, 0, 0.1);
+            }
+            to {
+                box-shadow: 
+                    0 0 30px rgba(0, 255, 0, 0.5),
+                    inset 0 0 30px rgba(0, 255, 0, 0.2);
+            }
+        }
+
+        /* Terminal header */
+        .terminal-header {
+            background: rgba(0, 255, 0, 0.1);
+            border-bottom: 1px solid #00ff00;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 1px solid #00ff00;
+        }
+
+        .dot.red { background: #ff0000; border-color: #ff0000; box-shadow: 0 0 10px #ff0000; }
+        .dot.yellow { background: #ffff00; border-color: #ffff00; box-shadow: 0 0 10px #ffff00; }
+        .dot.green { background: #00ff00; box-shadow: 0 0 10px #00ff00; }
+
+        .terminal-title {
+            flex: 1;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #00ff00;
+            letter-spacing: 2px;
+        }
+
+        /* Terminal content */
+        .terminal-content {
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        /* Logo section */
+        .logo-container {
+            margin-bottom: 30px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .logo-container a {
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-container a:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-container img {
+            max-width: 200px;
+            height: auto;
+            filter: 
+                drop-shadow(0 0 20px rgba(0, 255, 0, 0.5))
+                brightness(1.2);
+        }
+
+        /* Command prompt style */
+        .command-line {
+            color: #00ff00;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            text-align: left;
+            animation: typing 2s steps(40) 1s forwards;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid #00ff00;
+            width: 0;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes typing {
+            from {
+                width: 0;
+            }
+            to {
+                width: 100%;
+                border-right: none;
+            }
+        }
+
+        /* Main heading */
+        h1 {
+            font-size: 4rem;
+            color: #00ff00;
+            text-shadow: 
+                0 0 10px #00ff00,
+                0 0 20px #00ff00,
+                0 0 30px #00ff00;
+            margin: 30px 0;
+            font-weight: 700;
+            letter-spacing: 5px;
+            animation: glitch 1s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% {
+                text-shadow: 
+                    0 0 10px #00ff00,
+                    0 0 20px #00ff00,
+                    0 0 30px #00ff00;
+            }
+            95% {
+                text-shadow: 
+                    0 0 10px #ff0000,
+                    2px 2px 10px #00ff00,
+                    -2px -2px 10px #0000ff;
+            }
+        }
+
+        /* Graphics card ASCII art */
+        .ascii-art {
+            font-size: 0.8rem;
+            color: #00ff00;
+            line-height: 1.2;
+            margin: 20px 0;
+            white-space: pre;
+            overflow-x: auto;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #00ff00;
+            margin-bottom: 40px;
+            opacity: 0.8;
+            letter-spacing: 2px;
+        }
+
+        /* Countdown section */
+        .countdown {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin: 40px 0;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .time-box {
+            background: rgba(0, 255, 0, 0.05);
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            padding: 25px 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 0 15px rgba(0, 255, 0, 0.3),
+                inset 0 0 15px rgba(0, 255, 0, 0.1);
+        }
+
+        .time-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(0, 255, 0, 0.1),
+                transparent
+            );
+            animation: scan 3s linear infinite;
+        }
+
+        @keyframes scan {
+            0% {
+                transform: translateX(-100%) translateY(-100%);
+            }
+            100% {
+                transform: translateX(100%) translateY(100%);
+            }
+        }
+
+        .time-box .number {
+            font-size: 3rem;
+            font-weight: 700;
+            display: block;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+            position: relative;
+            z-index: 1;
+        }
+
+        .time-box .label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-top: 10px;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Progress bar */
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 30px 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #00ff00);
+            box-shadow: 0 0 20px #00ff00;
+            animation: progress 2s linear infinite;
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        @keyframes progress {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        /* Status messages */
+        .status-messages {
+            text-align: left;
+            margin: 30px 0;
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        .status-line {
+            color: #00ff00;
+            opacity: 0;
+            animation: fadeInLine 0.5s ease-out forwards;
+        }
+
+        .status-line:nth-child(1) { animation-delay: 0.5s; }
+        .status-line:nth-child(2) { animation-delay: 1s; }
+        .status-line:nth-child(3) { animation-delay: 1.5s; }
+        .status-line:nth-child(4) { animation-delay: 2s; }
+
+        @keyframes fadeInLine {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .status-line span {
+            color: #00ff00;
+        }
+
+        .status-line.success span {
+            color: #00ff00;
+        }
+
+        .status-line.warning span {
+            color: #ffff00;
+        }
+
+        /* Developer credit */
+        .developer {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(0, 255, 0, 0.3);
+            font-size: 1rem;
+            color: #00ff00;
+            letter-spacing: 1px;
+        }
+
+        .developer a {
+            color: #00ff00;
+            text-decoration: none;
+            font-weight: 700;
+            text-shadow: 0 0 10px #00ff00;
+            transition: all 0.3s ease;
+        }
+
+        .developer a:hover {
+            color: #00ff00;
+            text-shadow: 0 0 20px #00ff00;
+            letter-spacing: 3px;
+        }
+
+        /* Cursor blink effect */
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background: #00ff00;
+            animation: blink 1s infinite;
+            margin-left: 5px;
+        }
+
+        @keyframes blink {
+            0%, 49% {
+                opacity: 1;
+            }
+            50%, 100% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+                letter-spacing: 3px;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .terminal-content {
+                padding: 30px 20px;
+            }
+
+            .countdown {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .time-box {
+                padding: 20px 10px;
+            }
+
+            .time-box .number {
+                font-size: 2.5rem;
+            }
+
+            .time-box .label {
+                font-size: 0.7rem;
+            }
+
+            .logo-container img {
+                max-width: 150px;
+            }
+
+            .ascii-art {
+                font-size: 0.6rem;
+            }
+
+            .status-messages {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+                letter-spacing: 2px;
+            }
+
+            .terminal-header {
+                padding: 10px 15px;
+            }
+
+            .terminal-title {
+                font-size: 0.7rem;
+            }
+
+            .dot {
+                width: 10px;
+                height: 10px;
+            }
+
+            .time-box .number {
+                font-size: 2rem;
+            }
+
+            .countdown {
+                gap: 10px;
+            }
+
+            .logo-container img {
+                max-width: 120px;
+            }
+
+            .ascii-art {
+                font-size: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Matrix falling numbers canvas -->
+    <canvas id="matrixCanvas"></canvas>
+
+    <!-- Background effects -->
+    <div class="matrix-bg"></div>
+    <div class="grid-lines"></div>
+    <div class="glitch-particles" id="glitchParticles"></div>
+
+    <!-- Main container -->
+    <div class="container">
+        <div class="terminal-window">
+            <!-- Terminal header -->
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                </div>
+                <div class="terminal-title">Yahia Habib</div>
+            </div>
+
+            <!-- Terminal content -->
+            <div class="terminal-content">
+                <!-- Logo -->
+                <div class="logo-container">
+                    <a href="https://github.com/Yahia-Habib" target="_blank">
+                    </a>
+                </div>
+
+                <!-- ASCII Art Graphics Card -->
+                <div class="ascii-art">
+                </div>
+
+                <!-- Main heading -->
+                <h1>COMING SOON</h1>
+                <p class="subtitle">&gt; INITIALIZING SYSTEM...</p>
+
+                <!-- Status messages -->
+                <div class="status-messages">
+                    <div class="status-line success">[<span>✓</span>] System boot successful...</div>
+                    <div class="status-line success">[<span>✓</span>] Loading modules...</div>
+                    <div class="status-line success">[<span>✓</span>] Configuring environment...</div>
+                    <div class="status-line warning">[<span>!</span>] Launch sequence initiated...</div>
+                </div>
+
+                <!-- Countdown Timer -->
+                <div class="countdown">
+                    <div class="time-box">
+                        <span class="number" id="days">00</span>
+                        <span class="label">Days</span>
+                    </div>
+                    <div class="time-box">
+                        <span class="number" id="hours">00</span>
+                        <span class="label">Hours</span>
+                    </div>
+                    <div class="time-box">
+                        <span class="number" id="minutes">00</span>
+                        <span class="label">Minutes</span>
+                    </div>
+                    <div class="time-box">
+                        <span class="number" id="seconds">00</span>
+                        <span class="label">Seconds</span>
+                    </div>
+                </div>
+
+                <!-- Progress bar -->
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+
+                <!-- Developer credit -->
+                <div class="developer">
+                    &gt; DEVELOPED BY <a href="https://github.com/Yahia-Habib" target="_blank">Yahia Habib</a><span class="cursor"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Matrix falling numbers effect
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Characters to display - numbers and some binary
+        const chars = '01234567890123456789ABCDEF';
+        const charArray = chars.split('');
+
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+
+        // Array to store y-position of each column
+        const drops = [];
+        for (let i = 0; i < columns; i++) {
+            drops[i] = Math.random() * -100;
+        }
+
+        // Draw function
+        function drawMatrix() {
+            // Semi-transparent black background for trail effect
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ff00';
+            ctx.font = fontSize + 'px Courier New';
+
+            // Loop through drops
+            for (let i = 0; i < drops.length; i++) {
+                // Random character
+                const text = charArray[Math.floor(Math.random() * charArray.length)];
+                
+                // Draw character
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
+                
+                // Gradient effect - brighter at the tip
+                const gradient = ctx.createLinearGradient(x, y - fontSize * 10, x, y);
+                gradient.addColorStop(0, 'rgba(0, 255, 0, 0)');
+                gradient.addColorStop(0.5, 'rgba(0, 255, 0, 0.5)');
+                gradient.addColorStop(1, 'rgba(0, 255, 0, 1)');
+                ctx.fillStyle = gradient;
+                
+                ctx.fillText(text, x, y);
+
+                // Reset drop to top randomly
+                if (y > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+
+                // Increment Y coordinate
+                drops[i]++;
+            }
+        }
+
+        // Run the animation
+        setInterval(drawMatrix, 35);
+
+        // Resize canvas on window resize
+        window.addEventListener('resize', function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Recalculate columns
+            const newColumns = canvas.width / fontSize;
+            drops.length = 0;
+            for (let i = 0; i < newColumns; i++) {
+                drops[i] = Math.random() * -100;
+            }
+        });
+
+        // Set launch date to 2 days from now
+        const now = new Date();
+        const launchDate = new Date(now.getTime() + (65 * 24 * 60 * 60 * 1000));
+
+        // Countdown timer
+        const countdown = setInterval(function() {
+            const currentTime = new Date().getTime();
+            const distance = launchDate - currentTime;
+
+            // Calculate time units
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Display the result
+            document.getElementById("days").innerText = String(days).padStart(2, '0');
+            document.getElementById("hours").innerText = String(hours).padStart(2, '0');
+            document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
+            document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
+
+            // Update progress bar
+            const totalTime = 65 * 24 * 60 * 60 * 1000; // 2 days in milliseconds
+            const elapsed = totalTime - distance;
+            const progress = (elapsed / totalTime) * 100;
+            document.getElementById("progressBar").style.width = progress + '%';
+
+            // If countdown is finished
+            if (distance < 0) {
+                clearInterval(countdown);
+                document.querySelector(".subtitle").innerText = "> SYSTEM ONLINE!";
+                document.getElementById("progressBar").style.width = '100%';
+            }
+        }, 1000);
+
+        // Generate glitch particles
+        const glitchContainer = document.getElementById('glitchParticles');
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'glitch-particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 3 + 's';
+            particle.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            glitchContainer.appendChild(particle);
+        }
+    </script>
+</body>
+</html>
