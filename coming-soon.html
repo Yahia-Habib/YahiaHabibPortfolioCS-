@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coming Soon — Yahia Habib</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syne:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void: #04020e;
+  --deep: #080518;
+  --card: rgba(12, 6, 35, 0.85);
+  --violet: #7c3aff;
+  --violet-bright: #a855f7;
+  --ice: #e0f2ff;
+  --ice-dim: rgba(224,242,255,0.6);
+  --glow-v: 0 0 30px rgba(124,58,255,0.5);
+  --glow-ice: 0 0 20px rgba(224,242,255,0.3);
+  --border: rgba(124,58,255,0.25);
+  --border-ice: rgba(224,242,255,0.12);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; scroll-behavior: smooth; }
+
+body {
+  font-family: 'Syne', sans-serif;
+  background: var(--void);
+  color: var(--ice);
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* ── NOISE GRAIN OVERLAY ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9000;
+  opacity: 0.6;
+}
+
+/* ── THREE.JS CANVAS ── */
+#three-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+/* ── AMBIENT BLOBS ── */
+.blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 1;
+  animation: blob-drift 12s ease-in-out infinite alternate;
+}
+.blob-1 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(124,58,255,0.18), transparent 70%);
+  top: -200px; left: -150px;
+}
+.blob-2 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(168,85,247,0.12), transparent 70%);
+  bottom: -150px; right: -100px;
+  animation-delay: -6s;
+}
+.blob-3 {
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(224,242,255,0.06), transparent 70%);
+  top: 40%; left: 60%;
+  animation-delay: -3s;
+}
+@keyframes blob-drift {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(40px, 30px) scale(1.08); }
+}
+
+/* ── SCAN LINE ── */
+.scanline {
+  position: fixed;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(to right, transparent, rgba(124,58,255,0.4), rgba(224,242,255,0.3), rgba(124,58,255,0.4), transparent);
+  z-index: 2;
+  animation: scan 6s linear infinite;
+  pointer-events: none;
+}
+@keyframes scan {
+  from { top: -2px; }
+  to   { top: 100vh; }
+}
+
+/* ── STAR FIELD ── */
+#stars { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+
+/* ── MAIN LAYOUT ── */
+.page {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 40px clamp(24px, 5vw, 80px);
+  gap: clamp(20px, 3vw, 40px);
+}
+
+/* ── LEFT PANEL ── */
+.left {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  animation: rise 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 0;
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.eyebrow {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: var(--violet-bright);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 32px;
+  height: 1px;
+  background: var(--violet-bright);
+  box-shadow: 0 0 8px var(--violet-bright);
+}
+
+.main-heading {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(2rem, 4vw, 4.5rem);
+  line-height: 0.95;
+  letter-spacing: -1px;
+  color: #fff;
+  margin-bottom: 8px;
+  position: relative;
+}
+.main-heading .line-2 {
+  display: block;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(124,58,255,0.7);
+  font-size: 0.7em;
+  letter-spacing: 2px;
+  margin-top: 4px;
+}
+.main-heading .shimmer {
+  background: linear-gradient(90deg, #fff 0%, var(--violet-bright) 40%, var(--ice) 70%, #fff 100%);
+  background-size: 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+}
+@keyframes shimmer {
+  from { background-position: 200% center; }
+  to   { background-position: -200% center; }
+}
+
+.tagline {
+  font-size: 0.9rem;
+  color: var(--ice-dim);
+  line-height: 1.7;
+  margin: 16px 0 28px;
+  max-width: 420px;
+  font-weight: 300;
+  border-left: 2px solid rgba(124,58,255,0.4);
+  padding-left: 20px;
+}
+
+/* ── COUNTDOWN ── */
+.countdown-wrap {
+  margin-bottom: 24px;
+}
+.countdown-label {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 4px;
+  color: rgba(124,58,255,0.7);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.countdown {
+  display: flex;
+  gap: 20px;
+}
+.time-unit {
+  text-align: center;
+  position: relative;
+}
+.time-num {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(1.6rem, 2.5vw, 2.6rem);
+  color: #fff;
+  display: block;
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(168,85,247,0.6), 0 0 40px rgba(124,58,255,0.3);
+  background: rgba(12,6,35,0.6);
+  border: 1px solid var(--border);
+  padding: clamp(10px, 1.2vw, 16px) clamp(12px, 1.5vw, 20px) clamp(8px, 1vw, 12px);
+  min-width: clamp(58px, 6vw, 80px);
+  position: relative;
+  transition: all 0.15s;
+}
+.time-num::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--violet), transparent);
+}
+.time-num.tick {
+  transform: scale(1.05);
+  text-shadow: 0 0 30px rgba(168,85,247,1), 0 0 60px rgba(124,58,255,0.5);
+}
+.time-lbl {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 3px;
+  color: rgba(168,85,247,0.7);
+  text-transform: uppercase;
+  margin-top: 8px;
+  display: block;
+}
+.time-sep {
+  font-family: 'Orbitron', monospace;
+  font-size: 2.5rem;
+  color: rgba(124,58,255,0.4);
+  align-self: center;
+  padding-bottom: 24px;
+}
+
+/* ── PROGRESS ── */
+.progress-section { margin-bottom: 24px; }
+.progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 3px;
+  color: rgba(168,85,247,0.6);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.progress-track {
+  height: 3px;
+  background: rgba(124,58,255,0.12);
+  position: relative;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, var(--violet), var(--violet-bright), var(--ice));
+  box-shadow: 0 0 12px var(--violet-bright);
+  width: 0%;
+  transition: width 2s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+}
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  right: 0; top: -2px;
+  width: 8px; height: 7px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #fff, 0 0 20px var(--violet-bright);
+}
+.progress-glow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, transparent 40%, rgba(168,85,247,0.15));
+  animation: glow-pulse 2s ease-in-out infinite alternate;
+}
+@keyframes glow-pulse { from { opacity: 0.5; } to { opacity: 1; } }
+
+/* ── STATUS LOG ── */
+.status-log {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.log-line {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 1.5px;
+  color: rgba(224,242,255,0.4);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  animation: log-in 0.5s ease forwards;
+}
+.log-line:nth-child(1) { animation-delay: 0.6s; }
+.log-line:nth-child(2) { animation-delay: 1.2s; }
+.log-line:nth-child(3) { animation-delay: 1.8s; }
+.log-line:nth-child(4) { animation-delay: 2.4s; }
+.log-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.log-dot.ok  { background: #4ade80; box-shadow: 0 0 8px #4ade80; }
+.log-dot.warn{ background: #facc15; box-shadow: 0 0 8px #facc15; }
+.log-dot.active { background: var(--violet-bright); box-shadow: 0 0 8px var(--violet-bright); animation: blink-v 1s infinite; }
+@keyframes blink-v { 0%,100%{opacity:1} 50%{opacity:0.3} }
+@keyframes log-in { from { opacity:0; transform:translateX(-10px);} to { opacity:1; transform:none;} }
+
+/* ── NOTIFY FORM ── */
+.notify-wrap {
+  display: flex;
+  gap: 0;
+  max-width: 440px;
+}
+.notify-input {
+  flex: 1;
+  background: rgba(12,6,35,0.8);
+  border: 1px solid var(--border);
+  border-right: none;
+  color: var(--ice);
+  font-family: 'Syne', sans-serif;
+  font-size: 0.85rem;
+  padding: 14px 20px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.notify-input::placeholder { color: rgba(224,242,255,0.25); }
+.notify-input:focus { border-color: var(--violet-bright); }
+.notify-btn {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 14px 24px;
+  background: var(--violet);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+.notify-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+}
+.notify-btn:hover { background: var(--violet-bright); box-shadow: var(--glow-v); transform: translateX(2px); }
+
+/* ── SOCIAL LINKS ── */
+.socials {
+  display: flex;
+  gap: 16px;
+  margin-top: 28px;
+}
+.soc-link {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(224,242,255,0.35);
+  text-decoration: none;
+  padding: 8px 14px;
+  border: 1px solid rgba(124,58,255,0.2);
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.soc-link:hover { color: var(--violet-bright); border-color: var(--violet-bright); box-shadow: 0 0 12px rgba(124,58,255,0.2); }
+
+/* ── RIGHT PANEL (3D CANVAS AREA) ── */
+.right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  animation: fade-in-right 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+  opacity: 0;
+  padding: 40px 0;
+}
+@keyframes fade-in-right {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.model-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(44vw, 480px);
+  height: min(44vw, 480px);
+}
+
+#model-canvas {
+  width: 100% !important;
+  height: 100% !important;
+  position: relative;
+  z-index: 5;
+  display: block;
+}
+
+.model-ring-outer {
+  position: absolute;
+  width: 110%;
+  height: 110%;
+  border: 1px solid rgba(124,58,255,0.15);
+  border-radius: 50%;
+  animation: spin-slow 30s linear infinite;
+  pointer-events: none;
+}
+.model-ring-mid {
+  position: absolute;
+  width: 125%;
+  height: 125%;
+  border: 1px dashed rgba(168,85,247,0.1);
+  border-radius: 50%;
+  animation: spin-slow 22s linear infinite reverse;
+  pointer-events: none;
+}
+.model-label {
+  position: absolute;
+  bottom: -28px;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 4px;
+  color: rgba(168,85,247,0.5);
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+}
+@keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* ── CORNER DECORATORS ── */
+.corner {
+  position: fixed;
+  width: 40px; height: 40px;
+  pointer-events: none;
+  z-index: 20;
+}
+.corner-tl { top: 24px; left: 24px; border-top: 1px solid rgba(124,58,255,0.5); border-left: 1px solid rgba(124,58,255,0.5); }
+.corner-tr { top: 24px; right: 24px; border-top: 1px solid rgba(124,58,255,0.5); border-right: 1px solid rgba(124,58,255,0.5); }
+.corner-bl { bottom: 24px; left: 24px; border-bottom: 1px solid rgba(124,58,255,0.5); border-left: 1px solid rgba(124,58,255,0.5); }
+.corner-br { bottom: 24px; right: 24px; border-bottom: 1px solid rgba(124,58,255,0.5); border-right: 1px solid rgba(124,58,255,0.5); }
+
+.sig {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Orbitron', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 5px;
+  color: rgba(168,85,247,0.3);
+  text-transform: uppercase;
+  z-index: 20;
+  white-space: nowrap;
+}
+.sig a { color: rgba(168,85,247,0.6); text-decoration: none; transition: color 0.3s; }
+.sig a:hover { color: var(--violet-bright); }
+
+/* ── MOBILE ── */
+@media (max-width: 900px) {
+  .page { grid-template-columns: 1fr; padding: 80px 24px 60px; gap: 0; }
+  .right { padding: 20px 0 10px; order: -1; }
+  .model-wrap { width: min(80vw, 320px); height: min(80vw, 320px); }
+  .main-heading { font-size: clamp(1.8rem, 8vw, 2.8rem); }
+  .countdown { gap: 10px; }
+  .time-sep { font-size: 1.8rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- Background layers -->
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+<div class="scanline"></div>
+<canvas id="stars"></canvas>
+<div class="corner corner-tl"></div>
+<div class="corner corner-tr"></div>
+<div class="corner corner-bl"></div>
+<div class="corner corner-br"></div>
+
+<!-- Main layout -->
+<div class="page">
+
+  <!-- LEFT -->
+  <div class="left">
+    <div class="eyebrow">System Initializing</div>
+
+    <h1 class="main-heading">
+      <span class="shimmer">COMING</span>
+      <span class="line-2">SOON</span>
+    </h1>
+
+    <p class="tagline">
+      Something extraordinary is being assembled in the void. Yahia Habib's new digital space launches soon — precision-engineered, pixel-perfect.
+    </p>
+
+    <!-- Status log -->
+    <div class="status-log">
+      <div class="log-line"><span class="log-dot ok"></span> Core architecture compiled</div>
+      <div class="log-line"><span class="log-dot ok"></span> Design systems loaded</div>
+      <div class="log-line"><span class="log-dot warn"></span> Deploying final modules...</div>
+      <div class="log-line"><span class="log-dot active"></span> Awaiting launch sequence<span style="color:var(--violet-bright);animation:blink-v 1s infinite" id="cursor-blink">_</span></div>
+    </div>
+
+    <!-- Countdown -->
+    <div class="countdown-wrap">
+      <div class="countdown-label">// Launch Countdown</div>
+      <div class="countdown">
+        <div class="time-unit">
+          <span class="time-num" id="cd-days">00</span>
+          <span class="time-lbl">Days</span>
+        </div>
+        <span class="time-sep">:</span>
+        <div class="time-unit">
+          <span class="time-num" id="cd-hours">00</span>
+          <span class="time-lbl">Hours</span>
+        </div>
+        <span class="time-sep">:</span>
+        <div class="time-unit">
+          <span class="time-num" id="cd-mins">00</span>
+          <span class="time-lbl">Mins</span>
+        </div>
+        <span class="time-sep">:</span>
+        <div class="time-unit">
+          <span class="time-num" id="cd-secs">00</span>
+          <span class="time-lbl">Secs</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-section">
+      <div class="progress-meta">
+        <span>Build Progress</span>
+        <span id="prog-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="prog-fill"></div>
+        <div class="progress-glow"></div>
+      </div>
+    </div>
+
+    <!-- Notify -->
+    <div class="notify-wrap">
+      <input type="email" class="notify-input" placeholder="your@email.com" id="email-input">
+      <button class="notify-btn" onclick="handleNotify()">Notify Me</button>
+    </div>
+
+    <div class="socials">
+      <a href="https://github.com/Yahia-Habib" target="_blank" class="soc-link">⌥ GitHub</a>
+      <a href="https://www.linkedin.com/in/yahiahabib/" class="soc-link">◈ LinkedIn</a>
+      <a href="https://x.com/llbxploit" class="soc-link">◆ Twitter</a>
+    </div>
+  </div>
+
+  <!-- RIGHT: 3D MODEL -->
+  <div class="right">
+    <div class="model-wrap">
+      <div class="model-ring-outer"></div>
+      <div class="model-ring-mid"></div>
+      <canvas id="model-canvas"></canvas>
+      <div class="model-label">HOLOGRAPHIC CORE v1.0</div>
+    </div>
+  </div>
+</div>
+
+<!-- <div class="sig">© 2026 — <a href="https://github.com/Yahia-Habib">Yahia Habib</a> — All Systems Online Soon</div> -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* =====================================================
+   STAR FIELD CANVAS
+===================================================== */
+(function(){
+  const c = document.getElementById('stars');
+  const ctx = c.getContext('2d');
+  c.width = window.innerWidth;
+  c.height = window.innerHeight;
+  const stars = Array.from({length: 200}, () => ({
+    x: Math.random() * c.width,
+    y: Math.random() * c.height,
+    r: Math.random() * 1.2,
+    a: Math.random(),
+    speed: 0.002 + Math.random() * 0.005
+  }));
+  function drawStars() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    stars.forEach(s => {
+      s.a += s.speed;
+      const alpha = (Math.sin(s.a) + 1) / 2;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(224,242,255,${alpha * 0.6})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+  drawStars();
+  window.addEventListener('resize', () => {
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+  });
+})();
+
+/* =====================================================
+   THREE.JS 3D MODEL — Holographic Icosahedron Orb
+===================================================== */
+(function() {
+  const canvas = document.getElementById('model-canvas');
+  const wrap = canvas.parentElement;
+  function getSize() {
+    const s = Math.min(wrap.clientWidth, wrap.clientHeight) || 400;
+    return s;
+  }
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  let sz = getSize();
+  renderer.setSize(sz, sz);
+  renderer.setClearColor(0x000000, 0);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+  camera.position.set(0, 0, 5);
+
+  // ── COLORS
+  const COL_VIOLET = new THREE.Color(0x7c3aff);
+  const COL_ICE    = new THREE.Color(0xe0f2ff);
+  const COL_MID    = new THREE.Color(0xa855f7);
+
+  // ── OUTER WIREFRAME ICOSAHEDRON
+  const icoGeo = new THREE.IcosahedronGeometry(1.5, 1);
+  const icoMat = new THREE.MeshBasicMaterial({
+    color: 0xa855f7,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.35
+  });
+  const icoMesh = new THREE.Mesh(icoGeo, icoMat);
+  scene.add(icoMesh);
+
+  // ── INNER SOLID ICOSAHEDRON (glowing core)
+  const coreGeo = new THREE.IcosahedronGeometry(1.0, 1);
+  const coreMat = new THREE.MeshPhongMaterial({
+    color: 0x110630,
+    emissive: 0x4c1d95,
+    emissiveIntensity: 0.8,
+    transparent: true,
+    opacity: 0.7,
+    shininess: 120,
+    specular: 0xa855f7
+  });
+  const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+  scene.add(coreMesh);
+
+  // ── INNER WIREFRAME (tighter)
+  const innerWireGeo = new THREE.IcosahedronGeometry(1.0, 1);
+  const innerWireMat = new THREE.MeshBasicMaterial({
+    color: 0x7c3aff,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.6
+  });
+  const innerWire = new THREE.Mesh(innerWireGeo, innerWireMat);
+  scene.add(innerWire);
+
+  // ── ORBITING RING 1
+  const ring1Geo = new THREE.TorusGeometry(1.9, 0.008, 8, 80);
+  const ring1Mat = new THREE.MeshBasicMaterial({ color: 0x7c3aff, transparent: true, opacity: 0.6 });
+  const ring1 = new THREE.Mesh(ring1Geo, ring1Mat);
+  ring1.rotation.x = Math.PI / 2;
+  scene.add(ring1);
+
+  // ── ORBITING RING 2 (tilted)
+  const ring2Geo = new THREE.TorusGeometry(2.1, 0.005, 8, 80);
+  const ring2Mat = new THREE.MeshBasicMaterial({ color: 0xa855f7, transparent: true, opacity: 0.35 });
+  const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
+  ring2.rotation.x = Math.PI / 3;
+  ring2.rotation.z = Math.PI / 5;
+  scene.add(ring2);
+
+  // ── ORBITING RING 3 (different axis)
+  const ring3Geo = new THREE.TorusGeometry(2.3, 0.003, 8, 80);
+  const ring3Mat = new THREE.MeshBasicMaterial({ color: 0xe0f2ff, transparent: true, opacity: 0.15 });
+  const ring3 = new THREE.Mesh(ring3Geo, ring3Mat);
+  ring3.rotation.x = Math.PI / 6;
+  ring3.rotation.y = Math.PI / 4;
+  scene.add(ring3);
+
+  // ── FLOATING PARTICLES (orbiting dots)
+  const particleCount = 60;
+  const pGeo = new THREE.BufferGeometry();
+  const positions = new Float32Array(particleCount * 3);
+  const pAngles = [];
+  const pSpeeds = [];
+  const pRadii  = [];
+  const pYoffs  = [];
+  for (let i = 0; i < particleCount; i++) {
+    pAngles.push(Math.random() * Math.PI * 2);
+    pSpeeds.push((0.003 + Math.random() * 0.008) * (Math.random() > 0.5 ? 1 : -1));
+    pRadii.push(1.7 + Math.random() * 1.2);
+    pYoffs.push((Math.random() - 0.5) * 3);
+    positions[i * 3]     = 0;
+    positions[i * 3 + 1] = 0;
+    positions[i * 3 + 2] = 0;
+  }
+  pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const pMat = new THREE.PointsMaterial({
+    color: 0xa855f7,
+    size: 0.04,
+    transparent: true,
+    opacity: 0.8,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+  const particles = new THREE.Points(pGeo, pMat);
+  scene.add(particles);
+
+  // ── CENTRAL BRIGHT CORE SPHERE
+  const glowGeo = new THREE.SphereGeometry(0.38, 16, 16);
+  const glowMat = new THREE.MeshBasicMaterial({
+    color: 0xddd6fe,
+    transparent: true,
+    opacity: 0.9
+  });
+  const glowSphere = new THREE.Mesh(glowGeo, glowMat);
+  scene.add(glowSphere);
+
+  // ── LIGHTS
+  const ambientLight = new THREE.AmbientLight(0x1e0845, 2);
+  scene.add(ambientLight);
+  const pointLight1 = new THREE.PointLight(0x7c3aff, 3, 10);
+  pointLight1.position.set(3, 3, 3);
+  scene.add(pointLight1);
+  const pointLight2 = new THREE.PointLight(0xe0f2ff, 1.5, 8);
+  pointLight2.position.set(-3, -2, 2);
+  scene.add(pointLight2);
+  const pointLight3 = new THREE.PointLight(0xa855f7, 2, 6);
+  pointLight3.position.set(0, 0, 4);
+  scene.add(pointLight3);
+
+  // ── MOUSE INTERACTION
+  let mouseX = 0, mouseY = 0;
+  document.addEventListener('mousemove', e => {
+    mouseX = (e.clientX / window.innerWidth  - 0.5) * 2;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+  });
+
+  // ── RESIZE
+  window.addEventListener('resize', () => {
+    sz = getSize();
+    renderer.setSize(sz, sz);
+  });
+
+  // ── ANIMATION LOOP
+  let t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    t += 0.008;
+
+    // Rotate main pieces
+    icoMesh.rotation.x  += 0.003;
+    icoMesh.rotation.y  += 0.005;
+    coreMesh.rotation.x -= 0.004;
+    coreMesh.rotation.y += 0.006;
+    innerWire.rotation.x -= 0.004;
+    innerWire.rotation.y += 0.006;
+
+    // Mouse parallax
+    icoMesh.rotation.y  += mouseX * 0.002;
+    icoMesh.rotation.x  += mouseY * 0.002;
+
+    // Ring rotations
+    ring1.rotation.z += 0.006;
+    ring2.rotation.x += 0.004;
+    ring2.rotation.y += 0.003;
+    ring3.rotation.y -= 0.005;
+    ring3.rotation.z += 0.002;
+
+    // Glow sphere pulse
+    const pulse = 0.9 + Math.sin(t * 2) * 0.15;
+    glowSphere.scale.setScalar(pulse);
+    glowMat.opacity = 0.6 + Math.sin(t * 2.5) * 0.3;
+
+    // Particle orbit
+    const pos = pGeo.attributes.position.array;
+    for (let i = 0; i < particleCount; i++) {
+      pAngles[i] += pSpeeds[i];
+      const r = pRadii[i];
+      pos[i * 3]     = Math.cos(pAngles[i]) * r;
+      pos[i * 3 + 1] = pYoffs[i] + Math.sin(t * 0.5 + i) * 0.3;
+      pos[i * 3 + 2] = Math.sin(pAngles[i]) * r;
+    }
+    pGeo.attributes.position.needsUpdate = true;
+
+    // Light oscillation
+    pointLight1.intensity = 2.5 + Math.sin(t * 1.5) * 0.8;
+    pointLight3.position.x = Math.sin(t) * 3;
+    pointLight3.position.y = Math.cos(t * 0.7) * 2;
+
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+
+/* =====================================================
+   COUNTDOWN TIMER
+===================================================== */
+const launch = new Date(Date.now() + 65 * 24 * 60 * 60 * 1000);
+const TOTAL  = 65 * 24 * 60 * 60 * 1000;
+
+function pad(n) { return String(n).padStart(2, '0'); }
+function tick(id, val, prev) {
+  const el = document.getElementById(id);
+  if (el.textContent !== pad(val)) {
+    el.classList.add('tick');
+    el.textContent = pad(val);
+    setTimeout(() => el.classList.remove('tick'), 150);
+  }
+}
+
+setInterval(function() {
+  const diff = Math.max(0, launch - Date.now());
+  tick('cd-days',  Math.floor(diff / 86400000));
+  tick('cd-hours', Math.floor(diff % 86400000 / 3600000));
+  tick('cd-mins',  Math.floor(diff % 3600000  / 60000));
+  tick('cd-secs',  Math.floor(diff % 60000    / 1000));
+  const pct = Math.min(100, ((TOTAL - diff) / TOTAL) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent  = pct.toFixed(1) + '%';
+}, 1000);
+
+// Initial fill animation
+setTimeout(() => {
+  const diff = Math.max(0, launch - Date.now());
+  const pct  = ((TOTAL - diff) / TOTAL) * 100;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent  = pct.toFixed(1) + '%';
+}, 300);
+
+/* =====================================================
+   NOTIFY FORM
+===================================================== */
+function handleNotify() {
+  const email = document.getElementById('email-input').value;
+  const btn   = document.querySelector('.notify-btn');
+  if (!email || !email.includes('@')) {
+    btn.textContent = 'Invalid Email';
+    btn.style.background = '#ef4444';
+    setTimeout(() => { btn.textContent = 'Notify Me'; btn.style.background = ''; }, 2000);
+    return;
+  }
+  btn.textContent = '✓ Subscribed!';
+  btn.style.background = '#4ade80';
+  btn.style.color = '#000';
+  document.getElementById('email-input').value = '';
+  setTimeout(() => { btn.textContent = 'Notify Me'; btn.style.background = ''; btn.style.color = ''; }, 3000);
+}
+document.getElementById('email-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleNotify();
+});
+</script>
+</body>
+</html>
